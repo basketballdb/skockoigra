@@ -176,8 +176,8 @@
         .feedback {
             display: flex;
             gap: 10px;
-            flex-wrap: wrap;
-            width: 80px;
+            width: auto;
+            flex-wrap: nowrap;
         }
         
         .feedback-dot {
@@ -278,10 +278,26 @@
             margin-top: 20px;
             min-height: 60px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             font-size: 1.3rem;
             font-weight: bold;
+        }
+        
+        .solution-display {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .solution-symbol {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .win-message {
@@ -351,6 +367,10 @@
                 width: 20px;
                 height: 20px;
             }
+            
+            .solution-display {
+                gap: 8px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -394,6 +414,10 @@
             .feedback-dot {
                 width: 18px;
                 height: 18px;
+            }
+            
+            .solution-display {
+                gap: 6px;
             }
         }
     </style>
@@ -471,7 +495,7 @@
                 { id: 2, name: 'Pik', emoji: '♠️', type: 'emoji' },
                 { id: 3, name: 'Tref', emoji: '♣️', type: 'emoji' },
                 { id: 4, name: 'Zvezda', emoji: '⭐', type: 'emoji' },
-                { id: 5, name: 'Skočko', imageUrl: 'https://play-lh.googleusercontent.com/KffjHE-8sY6K9XLlKIkkmkpUkpCg_16puMVTS03QKrcttHnDWGcnz_se0mjsdrKSnJo', type: 'image' }
+                { id: 5, name: 'Skočko', imageUrl: 'https://i.imgur.com/4KN5Gdf.png', type: 'image' }
             ]
         };
 
@@ -815,22 +839,33 @@
             gameStatusEl.textContent = `Čestitamo! Pogodili ste kombinaciju u ${gameState.currentRow + 1} ${gameState.currentRow + 1 === 1 ? 'pokušaju' : 'pokušaja'}!`;
             gameStatusEl.className = 'game-status win-message';
             
-            // Reveal the combination
-            const combinationElement = document.createElement('div');
-            combinationElement.style.marginTop = '10px';
-            combinationElement.style.fontSize = '1.5rem';
+            // Create solution display container
+            const solutionContainer = document.createElement('div');
+            solutionContainer.className = 'solution-display';
             
-            let combinationHTML = '';
+            // Add label
+            const label = document.createElement('div');
+            label.textContent = 'Kombinacija:';
+            label.style.marginRight = '10px';
+            label.style.fontSize = '1.2rem';
+            solutionContainer.appendChild(label);
+            
+            // Add all symbols in a single row
             gameState.combination.forEach(symbol => {
+                const symbolElement = document.createElement('div');
+                symbolElement.className = 'solution-symbol';
+                
                 if (symbol.type === 'image') {
-                    combinationHTML += `<img src="${symbol.imageUrl}" alt="${symbol.name}" style="width: 30px; height: 30px; margin: 0 5px;">`;
+                    symbolElement.innerHTML = `<img src="${symbol.imageUrl}" alt="${symbol.name}" style="width: 30px; height: 30px;">`;
                 } else {
-                    combinationHTML += `<span style="font-size: 1.8rem; margin: 0 5px;">${symbol.emoji}</span>`;
+                    symbolElement.innerHTML = `<span style="font-size: 1.8rem;">${symbol.emoji}</span>`;
                 }
+                
+                solutionContainer.appendChild(symbolElement);
             });
             
-            combinationElement.innerHTML = `Kombinacija: ${combinationHTML}`;
-            gameStatusEl.appendChild(combinationElement);
+            // Append to game status
+            gameStatusEl.appendChild(solutionContainer);
         }
 
         // Show lose message
@@ -838,22 +873,33 @@
             gameStatusEl.textContent = 'Kraj igre! Potrošili ste sve pokušaje.';
             gameStatusEl.className = 'game-status lose-message';
             
-            // Reveal the combination
-            const combinationElement = document.createElement('div');
-            combinationElement.style.marginTop = '10px';
-            combinationElement.style.fontSize = '1.5rem';
+            // Create solution display container
+            const solutionContainer = document.createElement('div');
+            solutionContainer.className = 'solution-display';
             
-            let combinationHTML = '';
+            // Add label
+            const label = document.createElement('div');
+            label.textContent = 'Kombinacija je bila:';
+            label.style.marginRight = '10px';
+            label.style.fontSize = '1.2rem';
+            solutionContainer.appendChild(label);
+            
+            // Add all symbols in a single row
             gameState.combination.forEach(symbol => {
+                const symbolElement = document.createElement('div');
+                symbolElement.className = 'solution-symbol';
+                
                 if (symbol.type === 'image') {
-                    combinationHTML += `<img src="${symbol.imageUrl}" alt="${symbol.name}" style="width: 30px; height: 30px; margin: 0 5px;">`;
+                    symbolElement.innerHTML = `<img src="${symbol.imageUrl}" alt="${symbol.name}" style="width: 30px; height: 30px;">`;
                 } else {
-                    combinationHTML += `<span style="font-size: 1.8rem; margin: 0 5px;">${symbol.emoji}</span>`;
+                    symbolElement.innerHTML = `<span style="font-size: 1.8rem;">${symbol.emoji}</span>`;
                 }
+                
+                solutionContainer.appendChild(symbolElement);
             });
             
-            combinationElement.innerHTML = `Kombinacija je bila: ${combinationHTML}`;
-            gameStatusEl.appendChild(combinationElement);
+            // Append to game status
+            gameStatusEl.appendChild(solutionContainer);
         }
 
         // Update game status message
@@ -861,6 +907,12 @@
             if (!gameState.gameOver) {
                 gameStatusEl.textContent = message;
                 gameStatusEl.className = 'game-status';
+                
+                // Remove any existing solution display
+                const existingSolution = gameStatusEl.querySelector('.solution-display');
+                if (existingSolution) {
+                    existingSolution.remove();
+                }
             }
         }
 
@@ -868,6 +920,12 @@
         function resetGameStatus() {
             gameStatusEl.textContent = 'Izaberite 4 simbola za vaš prvi pokušaj!';
             gameStatusEl.className = 'game-status';
+            
+            // Remove any existing solution display
+            const existingSolution = gameStatusEl.querySelector('.solution-display');
+            if (existingSolution) {
+                existingSolution.remove();
+            }
         }
 
         // Event listeners
