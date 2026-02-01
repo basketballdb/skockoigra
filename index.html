@@ -89,8 +89,8 @@
         }
         
         .symbol-option {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             border-radius: 10px;
             display: flex;
             flex-direction: column;
@@ -115,7 +115,14 @@
         }
         
         .symbol-emoji {
-            font-size: 2rem;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .symbol-image {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
             margin-bottom: 5px;
         }
         
@@ -153,6 +160,12 @@
             justify-content: center;
             font-size: 2.5rem;
             border: 2px dashed rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .guess-slot:hover {
+            background-color: rgba(255, 255, 255, 0.15);
         }
         
         .guess-slot.filled {
@@ -162,24 +175,26 @@
         
         .feedback {
             display: flex;
-            gap: 8px;
+            gap: 10px;
+            flex-wrap: wrap;
+            width: 80px;
         }
         
         .feedback-dot {
-            width: 18px;
-            height: 18px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             background-color: rgba(255, 255, 255, 0.1);
         }
         
         .feedback-dot.red {
             background-color: #e94560;
-            box-shadow: 0 0 8px #e94560;
+            box-shadow: 0 0 10px #e94560;
         }
         
         .feedback-dot.yellow {
             background-color: #f39c12;
-            box-shadow: 0 0 8px #f39c12;
+            box-shadow: 0 0 10px #f39c12;
         }
         
         .current-row {
@@ -236,13 +251,23 @@
             box-shadow: 0 5px 15px rgba(15, 52, 96, 0.4);
         }
         
-        #clear-guess {
+        #clear-one {
             background-color: #333;
             color: white;
         }
         
-        #clear-guess:hover {
+        #clear-one:hover {
             background-color: #444;
+            transform: translateY(-3px);
+        }
+        
+        #clear-all {
+            background-color: #5d275d;
+            color: white;
+        }
+        
+        #clear-all:hover {
+            background-color: #4a1e4a;
             transform: translateY(-3px);
         }
         
@@ -305,16 +330,26 @@
             }
             
             .symbol-option {
-                width: 60px;
-                height: 60px;
+                width: 65px;
+                height: 65px;
             }
             
             .symbol-emoji {
-                font-size: 1.7rem;
+                font-size: 1.8rem;
+            }
+            
+            .symbol-image {
+                width: 35px;
+                height: 35px;
             }
             
             h1 {
                 font-size: 2.2rem;
+            }
+            
+            .feedback-dot {
+                width: 20px;
+                height: 20px;
             }
         }
         
@@ -334,12 +369,17 @@
             }
             
             .symbol-option {
-                width: 50px;
-                height: 50px;
+                width: 55px;
+                height: 55px;
             }
             
             .symbol-emoji {
                 font-size: 1.5rem;
+            }
+            
+            .symbol-image {
+                width: 30px;
+                height: 30px;
             }
             
             .symbol-name {
@@ -350,6 +390,11 @@
                 padding: 10px 15px;
                 font-size: 1rem;
             }
+            
+            .feedback-dot {
+                width: 18px;
+                height: 18px;
+            }
         }
     </style>
 </head>
@@ -357,20 +402,20 @@
     <div class="container">
         <header>
             <h1>SLAGALICA</h1>
-            <p class="subtitle">Guess the 4-symbol combination in 6 tries or less</p>
+            <p class="subtitle">Pogodite kombinaciju od 4 simbola u 6 pokušaja</p>
         </header>
         
         <div class="game-info">
             <div class="info-box">
-                <h3>Guesses Left</h3>
+                <h3>Preostali pokušaji</h3>
                 <p id="guesses-left">6</p>
             </div>
             <div class="info-box">
-                <h3>Current Round</h3>
+                <h3>Trenutni krug</h3>
                 <p id="current-round">1</p>
             </div>
             <div class="info-box">
-                <h3>Symbols</h3>
+                <h3>Simboli</h3>
                 <p>6</p>
             </div>
         </div>
@@ -384,28 +429,29 @@
         </div>
         
         <div class="controls">
-            <button id="submit-guess" disabled>Submit Guess</button>
-            <button id="clear-guess">Clear Guess</button>
-            <button id="new-game">New Game</button>
+            <button id="submit-guess" disabled>Potvrdi pokušaj</button>
+            <button id="clear-one">Obriši jedan</button>
+            <button id="clear-all">Obriši sve</button>
+            <button id="new-game">Nova igra</button>
         </div>
         
         <div class="game-status" id="game-status">
-            Select 4 symbols to make your first guess!
+            Izaberite 4 simbola za vaš prvi pokušaj!
         </div>
         
         <div class="instructions">
-            <h3>How to Play</h3>
+            <h3>Kako se igra</h3>
             <ul>
-                <li>Click on symbols from the top row to fill your guess slots</li>
-                <li>Guess the 4-symbol combination in 6 tries</li>
-                <li>After each guess, you'll get feedback:
+                <li>Kliknite na simbole iz gornjeg reda da biste popunili svoja polja za pogađanje</li>
+                <li>Pogodite kombinaciju od 4 simbola u 6 pokušaja</li>
+                <li>Nakon svakog pogađanja, dobićete povratne informacije:
                     <ul>
-                        <li><span style="color:#e94560">Red dot</span> = Correct symbol in correct position</li>
-                        <li><span style="color:#f39c12">Yellow dot</span> = Correct symbol in wrong position</li>
+                        <li><span style="color:#e94560">Crvena tačka</span> = Tačan simbol na ispravnoj poziciji</li>
+                        <li><span style="color:#f39c12">Žuta tačka</span> = Tačan simbol na pogrešnoj poziciji</li>
                     </ul>
                 </li>
-                <li>Symbols can repeat in the combination</li>
-                <li>Win by guessing all 4 symbols in the correct order!</li>
+                <li>Simboli se mogu ponavljati u kombinaciji</li>
+                <li>Pobedite pogodivši sva 4 simbola ispravnim redosledom!</li>
             </ul>
         </div>
     </div>
@@ -420,12 +466,12 @@
             gameOver: false,
             gameWon: false,
             symbols: [
-                { id: 0, name: 'Heart', emoji: '❤️' },
-                { id: 1, name: 'Diamond', emoji: '♦️' },
-                { id: 2, name: 'Spade', emoji: '♠️' },
-                { id: 3, name: 'Club', emoji: '♣️' },
-                { id: 4, name: 'Star', emoji: '⭐' },
-                { id: 5, name: 'Skocko', emoji: '🎯' } // Using target emoji for Skocko
+                { id: 0, name: 'Srce', emoji: '❤️', type: 'emoji' },
+                { id: 1, name: 'Karo', emoji: '♦️', type: 'emoji' },
+                { id: 2, name: 'Pik', emoji: '♠️', type: 'emoji' },
+                { id: 3, name: 'Tref', emoji: '♣️', type: 'emoji' },
+                { id: 4, name: 'Zvezda', emoji: '⭐', type: 'emoji' },
+                { id: 5, name: 'Skočko', imageUrl: 'https://i.imgur.com/4KN5Gdf.png', type: 'image' }
             ]
         };
 
@@ -435,7 +481,8 @@
         const guessesLeftEl = document.getElementById('guesses-left');
         const currentRoundEl = document.getElementById('current-round');
         const submitGuessBtn = document.getElementById('submit-guess');
-        const clearGuessBtn = document.getElementById('clear-guess');
+        const clearOneBtn = document.getElementById('clear-one');
+        const clearAllBtn = document.getElementById('clear-all');
         const newGameBtn = document.getElementById('new-game');
         const gameStatusEl = document.getElementById('game-status');
 
@@ -473,7 +520,7 @@
             }
             
             // For debugging - log the combination to console
-            console.log("Combination (for testing):", gameState.combination.map(s => s.name).join(', '));
+            console.log("Kombinacija (za testiranje):", gameState.combination.map(s => s.name).join(', '));
         }
 
         // Create symbol selection options
@@ -485,10 +532,17 @@
                 symbolOption.className = 'symbol-option';
                 symbolOption.dataset.id = symbol.id;
                 
-                symbolOption.innerHTML = `
-                    <div class="symbol-emoji">${symbol.emoji}</div>
-                    <div class="symbol-name">${symbol.name}</div>
-                `;
+                if (symbol.type === 'image') {
+                    symbolOption.innerHTML = `
+                        <img src="${symbol.imageUrl}" alt="${symbol.name}" class="symbol-image">
+                        <div class="symbol-name">${symbol.name}</div>
+                    `;
+                } else {
+                    symbolOption.innerHTML = `
+                        <div class="symbol-emoji">${symbol.emoji}</div>
+                        <div class="symbol-name">${symbol.name}</div>
+                    `;
+                }
                 
                 symbolOption.addEventListener('click', () => selectSymbol(symbol));
                 symbolOptionsEl.appendChild(symbolOption);
@@ -514,6 +568,50 @@
                     guessSlot.dataset.row = row;
                     guessSlot.dataset.slot = slot;
                     guessSlot.textContent = '?';
+                    
+                    // Add click event to remove individual symbol
+                    guessSlot.addEventListener('click', () => {
+                        if (parseInt(guessSlot.dataset.row) === gameState.currentRow && 
+                            gameState.currentGuess.length > 0 && 
+                            !gameState.gameOver) {
+                            
+                            // Find which slot was clicked
+                            const slotIndex = parseInt(guessSlot.dataset.slot);
+                            
+                            // Only remove if this slot is filled and it's the last filled slot
+                            // or if we're removing the exact slot clicked
+                            if (slotIndex < gameState.currentGuess.length) {
+                                // Remove from current guess array
+                                gameState.currentGuess.splice(slotIndex, 1);
+                                
+                                // Update all slots in the current row
+                                const currentRowSlots = document.querySelectorAll(`.guess-row[data-row="${gameState.currentRow}"] .guess-slot`);
+                                
+                                // Clear all slots
+                                currentRowSlots.forEach(slot => {
+                                    slot.textContent = '?';
+                                    slot.innerHTML = '?';
+                                    slot.classList.remove('filled');
+                                });
+                                
+                                // Re-fill slots up to the new currentGuess length
+                                gameState.currentGuess.forEach((symbol, index) => {
+                                    if (symbol.type === 'image') {
+                                        currentRowSlots[index].innerHTML = `<img src="${symbol.imageUrl}" alt="${symbol.name}" style="width: 40px; height: 40px;">`;
+                                    } else {
+                                        currentRowSlots[index].textContent = symbol.emoji;
+                                    }
+                                    currentRowSlots[index].classList.add('filled');
+                                });
+                                
+                                // Update submit button state
+                                submitGuessBtn.disabled = gameState.currentGuess.length !== 4;
+                                
+                                updateGameStatus('Izaberite simbole za vaš pokušaj...');
+                            }
+                        }
+                    });
+                    
                     guessSlots.appendChild(guessSlot);
                 }
                 
@@ -548,15 +646,22 @@
             
             // Update the corresponding slot in the current row
             const currentRowSlots = document.querySelectorAll(`.guess-row[data-row="${gameState.currentRow}"] .guess-slot`);
-            currentRowSlots[gameState.currentGuess.length - 1].textContent = symbol.emoji;
-            currentRowSlots[gameState.currentGuess.length - 1].classList.add('filled');
+            const currentSlot = currentRowSlots[gameState.currentGuess.length - 1];
+            
+            if (symbol.type === 'image') {
+                currentSlot.innerHTML = `<img src="${symbol.imageUrl}" alt="${symbol.name}" style="width: 40px; height: 40px;">`;
+            } else {
+                currentSlot.textContent = symbol.emoji;
+            }
+            
+            currentSlot.classList.add('filled');
             
             // Enable submit button if guess is complete
             if (gameState.currentGuess.length === 4) {
                 submitGuessBtn.disabled = false;
             }
             
-            updateGameStatus('Select symbols for your guess...');
+            updateGameStatus('Izaberite simbole za vaš pokušaj...');
         }
 
         // Submit the current guess
@@ -604,7 +709,7 @@
                 gameState.gameOver = true;
                 showLoseMessage();
             } else {
-                updateGameStatus('Select symbols for your next guess...');
+                updateGameStatus('Izaberite simbole za vaš sledeći pokušaj...');
             }
         }
 
@@ -666,8 +771,27 @@
             }
         }
 
-        // Clear the current guess
-        function clearGuess() {
+        // Clear the last symbol from the current guess
+        function clearOneSymbol() {
+            if (gameState.gameOver || gameState.currentGuess.length === 0) return;
+            
+            // Remove the last symbol
+            gameState.currentGuess.pop();
+            
+            // Clear the last slot in the current row
+            const currentRowSlots = document.querySelectorAll(`.guess-row[data-row="${gameState.currentRow}"] .guess-slot`);
+            currentRowSlots[gameState.currentGuess.length].textContent = '?';
+            currentRowSlots[gameState.currentGuess.length].innerHTML = '?';
+            currentRowSlots[gameState.currentGuess.length].classList.remove('filled');
+            
+            // Disable submit button if guess is not complete
+            submitGuessBtn.disabled = gameState.currentGuess.length !== 4;
+            
+            updateGameStatus('Obrisan poslednji simbol. Izaberite simbole za vaš pokušaj...');
+        }
+
+        // Clear all symbols from the current guess
+        function clearAllSymbols() {
             if (gameState.gameOver) return;
             
             gameState.currentGuess = [];
@@ -676,40 +800,59 @@
             const currentRowSlots = document.querySelectorAll(`.guess-row[data-row="${gameState.currentRow}"] .guess-slot`);
             currentRowSlots.forEach(slot => {
                 slot.textContent = '?';
+                slot.innerHTML = '?';
                 slot.classList.remove('filled');
             });
             
             // Disable submit button
             submitGuessBtn.disabled = true;
             
-            updateGameStatus('Guess cleared. Select symbols for your guess...');
+            updateGameStatus('Svi simboli obrisani. Izaberite simbole za vaš pokušaj...');
         }
 
         // Show win message
         function showWinMessage() {
-            gameStatusEl.textContent = `Congratulations! You guessed the combination in ${gameState.currentRow + 1} ${gameState.currentRow + 1 === 1 ? 'try' : 'tries'}!`;
+            gameStatusEl.textContent = `Čestitamo! Pogodili ste kombinaciju u ${gameState.currentRow + 1} ${gameState.currentRow + 1 === 1 ? 'pokušaju' : 'pokušaja'}!`;
             gameStatusEl.className = 'game-status win-message';
             
             // Reveal the combination
-            const combinationText = gameState.combination.map(s => s.emoji).join(' ');
             const combinationElement = document.createElement('div');
             combinationElement.style.marginTop = '10px';
             combinationElement.style.fontSize = '1.5rem';
-            combinationElement.textContent = `Combination: ${combinationText}`;
+            
+            let combinationHTML = '';
+            gameState.combination.forEach(symbol => {
+                if (symbol.type === 'image') {
+                    combinationHTML += `<img src="${symbol.imageUrl}" alt="${symbol.name}" style="width: 30px; height: 30px; margin: 0 5px;">`;
+                } else {
+                    combinationHTML += `<span style="font-size: 1.8rem; margin: 0 5px;">${symbol.emoji}</span>`;
+                }
+            });
+            
+            combinationElement.innerHTML = `Kombinacija: ${combinationHTML}`;
             gameStatusEl.appendChild(combinationElement);
         }
 
         // Show lose message
         function showLoseMessage() {
-            gameStatusEl.textContent = 'Game Over! You ran out of guesses.';
+            gameStatusEl.textContent = 'Kraj igre! Potrošili ste sve pokušaje.';
             gameStatusEl.className = 'game-status lose-message';
             
             // Reveal the combination
-            const combinationText = gameState.combination.map(s => s.emoji).join(' ');
             const combinationElement = document.createElement('div');
             combinationElement.style.marginTop = '10px';
             combinationElement.style.fontSize = '1.5rem';
-            combinationElement.textContent = `The combination was: ${combinationText}`;
+            
+            let combinationHTML = '';
+            gameState.combination.forEach(symbol => {
+                if (symbol.type === 'image') {
+                    combinationHTML += `<img src="${symbol.imageUrl}" alt="${symbol.name}" style="width: 30px; height: 30px; margin: 0 5px;">`;
+                } else {
+                    combinationHTML += `<span style="font-size: 1.8rem; margin: 0 5px;">${symbol.emoji}</span>`;
+                }
+            });
+            
+            combinationElement.innerHTML = `Kombinacija je bila: ${combinationHTML}`;
             gameStatusEl.appendChild(combinationElement);
         }
 
@@ -723,21 +866,26 @@
 
         // Reset game status display
         function resetGameStatus() {
-            gameStatusEl.textContent = 'Select 4 symbols to make your first guess!';
+            gameStatusEl.textContent = 'Izaberite 4 simbola za vaš prvi pokušaj!';
             gameStatusEl.className = 'game-status';
         }
 
         // Event listeners
         submitGuessBtn.addEventListener('click', submitGuess);
-        clearGuessBtn.addEventListener('click', clearGuess);
+        clearOneBtn.addEventListener('click', clearOneSymbol);
+        clearAllBtn.addEventListener('click', clearAllSymbols);
         newGameBtn.addEventListener('click', initGame);
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !submitGuessBtn.disabled) {
                 submitGuess();
-            } else if (e.key === 'Escape') {
-                clearGuess();
+            } else if (e.key === 'Backspace') {
+                if (e.ctrlKey) {
+                    clearAllSymbols();
+                } else {
+                    clearOneSymbol();
+                }
             } else if (e.key === 'r' || e.key === 'R') {
                 if (e.ctrlKey) {
                     initGame();
